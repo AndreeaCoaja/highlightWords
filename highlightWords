@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>HighlightWords</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+
+</head>
+
+<body>
+    <div id="div">
+        What is Lorem Ipsum? Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. Why do we use it? It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).
+
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+    <script type="text/javascript">
+        function getSelectionHtml() {
+            var html = "";
+            if (typeof window.getSelection != "undefined") { // all browsers, except IE before version 9
+                var sel = window.getSelection(); //in sel is being saved what is selected by user
+                if (sel.rangeCount) { //
+                    console.log(sel.rangeCount)
+                    var container = document.createElement("div"); //creates a div
+                    console.log("container");
+                    console.log(container);
+                    for (var i = 0, len = sel.rangeCount; i < len; ++i) {
+                        container.appendChild(sel.getRangeAt(i).cloneContents()); //it appends inside the div the selected text
+                    }
+                    console.log(container);
+                    html = container.innerHTML;
+                    console.log(html)
+                }
+            } else if (typeof document.selection != "undefined") {
+                if (document.selection.type == "Text") {
+                    html = document.selection.createRange().htmlText;
+                }
+            }
+            return html;
+        }
+
+        jQuery.fn.highlight = function(what, spanClass) {
+            return this.each(function() {
+                var container = this;
+                content = container.innerHTML;
+                pattern = new RegExp(what, 'ig'); //case-insensitive +global matching /$(what)/ig
+                replaceWith = '<span class="' + spanClass + '">' + what + '</span>'; //adds the selected text in a span with a specific class(highlight) in order to change the style in css for the selected text
+                highlighted = content.replace(pattern, replaceWith); // replace() method searches the given regular expression, and returns a new string where the pattern is replaced whit replaceWith.
+                container.innerHTML = highlighted;
+            });
+        }
+
+        jQuery.fn.nohighlight = function(text) { //modifying a prototype
+            return this.each(function() { //When each() is called it iterates over the DOM elements 
+                var container = this;
+                content = container.innerHTML;
+                nohighlight = content.replace(content, text); //change the text with highlights with the text from inside the big div
+                container.innerHTML = nohighlight;
+            });
+        }
+
+        $(document).on("dblclick", function() {
+            console.log("found");
+
+            var mytext = getSelectionHtml(); //selects all words that matches with the selected one
+            $('div').nohighlight($('div').text()); //extracts the text from the div and uses the method nohighlight; firstly it deletes all the previous highlights
+            $('div').highlight(mytext, 'highlight'); //it highlights all matches from the selected word 
+
+            console.log(mytext);
+        });
+    </script>
+</body>
+
+</html>
